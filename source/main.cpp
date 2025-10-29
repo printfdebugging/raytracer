@@ -10,26 +10,26 @@
 double hit_sphere(const point3& center, double radius, const ray& traced_ray)
 {
     vec3   qc = center - traced_ray.origin();
-    double a  = dot(traced_ray.direction(), traced_ray.direction());
-    double b  = -2.0 * dot(traced_ray.direction(), qc);
-    double c  = dot(qc, qc) - radius * radius;
+    double a  = traced_ray.direction().length_squared();
+    double h  = dot(traced_ray.direction(), qc);
+    double c  = qc.length_squared() - radius * radius;
 
-    double discriminant = b * b - 4 * a * c;
+    double discriminant = h * h - a * c;
     if (discriminant < 0)
         return -1;
     else
-        return (-b - std::sqrt(discriminant)) / (2.0 * a);
+        return (h - std::sqrt(discriminant)) / a;
 }
 
 color ray_color(const ray& traced_ray)
 {
     point3 sphere_center = point3(0, 0, -1);
     double sphere_radius = 0.5;
-    double t             = hit_sphere(sphere_center, sphere_radius, traced_ray);
-    if (t > 0.0)
+    double ray_magnitude = hit_sphere(sphere_center, sphere_radius, traced_ray);
+    if (ray_magnitude > 0.0)
     {
-        vec3 N = unit_vector(traced_ray.at(t) - sphere_center);
-        return color(N.x() + 1, N.y() + 1, N.z() + 1) / 2.0;
+        vec3 normal = unit_vector(traced_ray.at(ray_magnitude) - sphere_center);
+        return color(normal.x() + 1, normal.y() + 1, normal.z() + 1) / 2.0;
     }
 
     vec3   unit_direction    = unit_vector(traced_ray.direction());
