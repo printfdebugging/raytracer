@@ -1,12 +1,13 @@
 #include "color.hpp"
 #include "ray.hpp"
 #include "vec3.hpp"
+#include <cmath>
 
 /*
     solving quadratic equation, see the link below for proper mathematical solution/explaination.
     https://raytracing.github.io/books/RayTracingInOneWeekend.html#addingasphere/ray-sphereintersection
 */
-bool hit_sphere(const point3& center, double radius, const ray& traced_ray)
+double hit_sphere(const point3& center, double radius, const ray& traced_ray)
 {
     vec3   qc = center - traced_ray.origin();
     double a  = dot(traced_ray.direction(), traced_ray.direction());
@@ -14,13 +15,22 @@ bool hit_sphere(const point3& center, double radius, const ray& traced_ray)
     double c  = dot(qc, qc) - radius * radius;
 
     double discriminant = b * b - 4 * a * c;
-    return (discriminant >= 0);
+    if (discriminant < 0)
+        return -1;
+    else
+        return (-b - std::sqrt(discriminant)) / (2.0 * a);
 }
 
 color ray_color(const ray& traced_ray)
 {
-    if (hit_sphere(point3(0, 0, -1), 0.5, traced_ray))
-        return color(1, 0, 0);
+    point3 sphere_center = point3(0, 0, -1);
+    double sphere_radius = 0.5;
+    double t             = hit_sphere(sphere_center, sphere_radius, traced_ray);
+    if (t > 0.0)
+    {
+        vec3 N = unit_vector(traced_ray.at(t) - sphere_center);
+        return color(N.x() + 1, N.y() + 1, N.z() + 1) / 2.0;
+    }
 
     vec3   unit_direction    = unit_vector(traced_ray.direction());
     double value_bw_zero_one = (unit_direction.y() + 1.0) / 2;

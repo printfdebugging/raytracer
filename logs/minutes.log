@@ -9,3 +9,6 @@
 - pixel spacing is the distance between two adjacent pixels, square pixels are standard
 - the ray passes through the center of the square pixel
 - keep a notebook and pen around when reading/writing graphics, coordinates can be a bit tricky.
+
+# 6.1 shading with surface normals
+- surface normals are needed to find at what angle the ray hits the surface
