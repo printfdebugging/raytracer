@@ -1,3 +1,10 @@
+# 1.0 overview
+raytracing could mean many things, we are writing
+a `path tracer` here, a fairly general one. another
+approach is `lumen` which is faster at runtime but
+creates worst shadows and has less details compared
+to path tracer.
+
 # 4.2 sending rays into the scene
 - imagine your screen (viewport) as a grid through which you look into the 3d world
 - eye to screen (viewport) distance is known as focal length
