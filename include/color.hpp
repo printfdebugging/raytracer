@@ -20,7 +20,7 @@ inline void write_color(std::ostream& out, const color& pixel)
     int image_green = int(255.999 * green);
     int image_blue  = int(255.999 * blue);
 
-    std::cout << image_red << ' '
-              << image_green << ' '
-              << image_blue << std::endl;
+    out << image_red << ' '
+        << image_green << ' '
+        << image_blue << std::endl;
 }
