@@ -1,35 +1,15 @@
-#include "color.hpp"
-#include "ray.hpp"
-#include "vec3.hpp"
-#include <cmath>
+#include "rtweekend.hpp"
 
-/*
-    solving quadratic equation, see the link below for proper mathematical solution/explaination.
-    https://raytracing.github.io/books/RayTracingInOneWeekend.html#addingasphere/ray-sphereintersection
-*/
-double hit_sphere(const point3& center, double radius, const ray& traced_ray)
+#include "hittable.hpp"
+#include "hittable_list.hpp"
+#include "sphere.hpp"
+
+color ray_color(const ray& traced_ray, const hittable& world)
 {
-    vec3   qc = center - traced_ray.origin();
-    double a  = traced_ray.direction().length_squared();
-    double h  = dot(traced_ray.direction(), qc);
-    double c  = qc.length_squared() - radius * radius;
-
-    double discriminant = h * h - a * c;
-    if (discriminant < 0)
-        return -1;
-    else
-        return (h - std::sqrt(discriminant)) / a;
-}
-
-color ray_color(const ray& traced_ray)
-{
-    point3 sphere_center = point3(0, 0, -1);
-    double sphere_radius = 0.5;
-    double ray_magnitude = hit_sphere(sphere_center, sphere_radius, traced_ray);
-    if (ray_magnitude > 0.0)
+    hit_record rec;
+    if (world.hit(traced_ray, 0, infinity, rec))
     {
-        vec3 normal = unit_vector(traced_ray.at(ray_magnitude) - sphere_center);
-        return color(normal.x() + 1, normal.y() + 1, normal.z() + 1) / 2.0;
+        return 0.5 * (rec.normal + color(1, 1, 1));
     }
 
     vec3   unit_direction    = unit_vector(traced_ray.direction());
@@ -57,6 +37,10 @@ int main()
     int image_height = int(image_width / aspect_ratio);
     image_height     = (image_height < 1) ? 1 : image_height;
 
+    hittable_list world;
+    world.add(std::make_shared<sphere>(point3(0, 0, -1), 0.5));
+    world.add(std::make_shared<sphere>(point3(0, -100.5, -1), 100));
+
     double focal_length    = 1.0;
     double viewport_height = 2.0;
     double viewport_width  = viewport_height * (double(image_width) / image_height);
@@ -83,7 +67,7 @@ int main()
             point3 pixel_center  = pixel_zero_location + (x * pixel_delta_u) + (y * pixel_delta_v);
             vec3   ray_direction = pixel_center - camera_center;
             ray    traced_ray    = ray(camera_center, ray_direction);
-            color  pixel_color   = ray_color(traced_ray);
+            color  pixel_color   = ray_color(traced_ray, world);
             write_color(std::cout, pixel_color);
         }
     }

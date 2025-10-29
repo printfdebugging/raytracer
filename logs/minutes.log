@@ -12,3 +12,20 @@
 
 # 6.1 shading with surface normals
 - surface normals are needed to find at what angle the ray hits the surface
+- whether the normals always point outside is a design decision (should use one consistent direction)
+- here the normals point outside the surface by default
+- if the ray is coming from inside the surface, it will point along the normal at the intersection point, dot product > 0
+- if the ray is coming from outside, then it will point against the normal at intersection point, thus dot product < 0
+
+# 6.5 a list of hitable objects
+
+although we pass the ray trom camera through the pixel (while
+calculating) it's direction, we do not trace that ray's path from the
+ray's point of view, but instead we loop over all the objects check if
+any of those objects intersects with the ray, and while we do that we
+keep a record of the closest intersection.
+
+so there's a camera and a viewport and a world on the other side of
+that viewport. we then pass rays through each pixel and freeze time,
+then go over each object in the world (possibly the visible parts of it)
+and see which ones we hit... am repeating myself.
