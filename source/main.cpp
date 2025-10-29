@@ -2,8 +2,26 @@
 #include "ray.hpp"
 #include "vec3.hpp"
 
+/*
+    solving quadratic equation, see the link below for proper mathematical solution/explaination.
+    https://raytracing.github.io/books/RayTracingInOneWeekend.html#addingasphere/ray-sphereintersection
+*/
+bool hit_sphere(const point3& center, double radius, const ray& traced_ray)
+{
+    vec3   qc = center - traced_ray.origin();
+    double a  = dot(traced_ray.direction(), traced_ray.direction());
+    double b  = -2.0 * dot(traced_ray.direction(), qc);
+    double c  = dot(qc, qc) - radius * radius;
+
+    double discriminant = b * b - 4 * a * c;
+    return (discriminant >= 0);
+}
+
 color ray_color(const ray& traced_ray)
 {
+    if (hit_sphere(point3(0, 0, -1), 0.5, traced_ray))
+        return color(1, 0, 0);
+
     vec3   unit_direction    = unit_vector(traced_ray.direction());
     double value_bw_zero_one = (unit_direction.y() + 1.0) / 2;
     return (1.0 - value_bw_zero_one) * color(1.0, 1.0, 1.0) + value_bw_zero_one * color(0.5, 0.7, 1.0);
