@@ -1,4 +1,13 @@
 #include "color.hpp"
+#include "ray.hpp"
+#include "vec3.hpp"
+
+color ray_color(const ray& traced_ray)
+{
+    vec3   unit_direction    = unit_vector(traced_ray.direction());
+    double value_bw_zero_one = (unit_direction.y() + 1.0) / 2;
+    return (1.0 - value_bw_zero_one) * color(1.0, 1.0, 1.0) + value_bw_zero_one * color(0.5, 0.7, 1.0);
+}
 
 /*
     raytracing could mean many things, we are writing
@@ -9,8 +18,30 @@
 */
 int main()
 {
-    int image_width  = 256;
-    int image_height = 256;
+    int    image_width  = 700;
+    double aspect_ratio = 16.0 / 9.0;
+
+    /*
+        this helps us scale the image just by changing
+        the image width, the height changes accordingly
+        to maintain the `aspect_ratio`.
+    */
+    int image_height = int(image_width / aspect_ratio);
+    image_height     = (image_height < 1) ? 1 : image_height;
+
+    double focal_length    = 1.0;
+    double viewport_height = 2.0;
+    double viewport_width  = viewport_height * (double(image_width) / image_height);
+    point3 camera_center   = point3(0, 0, 0);
+
+    vec3 viewport_u = vec3(viewport_width, 0, 0);
+    vec3 viewport_v = vec3(0, -viewport_height, 0);
+    /* here we are essentially dividing the viewport into square pixels. */
+    vec3 pixel_delta_u = viewport_u / image_width;
+    vec3 pixel_delta_v = viewport_v / image_height;
+
+    point3 viewport_upper_left = camera_center - vec3(0, 0, focal_length) - viewport_u / 2 - viewport_v / 2;
+    point3 pixel_zero_location = viewport_upper_left + (pixel_delta_u + pixel_delta_v) / 2;
 
     std::cout << "P3" << std::endl
               << image_width << ' ' << image_height << std::endl
@@ -19,17 +50,12 @@ int main()
     for (int y = 0; y < image_height; ++y)
     {
         std::clog << '\r' << "scanlines remaining: " << (image_height - y) << ' ' << std::flush;
-
         for (int x = 0; x < image_width; ++x)
         {
-            /*
-                `x / width - 1` goes from 0 to 1 across
-                the width of the image, same for the
-                other expression in vertical direction.
-            */
-            color pixel_color = color(double(x) / (image_width - 1),
-                                      double(y) / (image_height - 1),
-                                      0.0);
+            point3 pixel_center  = pixel_zero_location + (x * pixel_delta_u) + (y * pixel_delta_v);
+            vec3   ray_direction = pixel_center - camera_center;
+            ray    traced_ray    = ray(camera_center, ray_direction);
+            color  pixel_color   = ray_color(traced_ray);
             write_color(std::cout, pixel_color);
         }
     }

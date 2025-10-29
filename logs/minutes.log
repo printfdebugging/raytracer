@@ -1,0 +1,11 @@
+# 4.2 sending rays into the scene
+- imagine your screen (viewport) as a grid through which you look into the 3d world
+- eye to screen (viewport) distance is known as focal length
+- set image width and aspect-ratio and calculate the height, this makes scaling easy
+- viewport-width is calculated from viewport-height and actual image aspect ratio
+- suggested read https://alvyray.com/Memos/CG/Microsoft/6_pixel.pdf
+- 3d coordinates follow the right hand system with -z going into the screen
+- image (viewport) coordinates have y axis pointing downwards with top left point being (0,0)
+- pixel spacing is the distance between two adjacent pixels, square pixels are standard
+- the ray passes through the center of the square pixel
+- keep a notebook and pen around when reading/writing graphics, coordinates can be a bit tricky.
